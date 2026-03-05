@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 ![Proof of age attestations for all Europeans - An age verification solution for EU citizens and residents](./docs/media/top-banner-av.png)
 
 <h1 align="center">
-    Age Verification (AV) Android application
+    Age Verification (AV) Android wallet modified to run with the ewQwe Relying Party Demo Webapp.
 </h1>
 
 <p align="center">
@@ -19,6 +19,12 @@ SPDX-License-Identifier: Apache-2.0
   <a href="#code-of-conduct">Code of Conduct</a> •
   <a href="#license">Licensing</a>
 </p>
+
+
+> [!WARNING]
+> **Security Notice**: This development version of the application contains mechanisms to bypass TLS certificate validation. This is intended for testing purposes only and must be removed or disabled in production environments. For more details, see [ewqwe.md](./ewqwe.md).
+
+---
 
 ## About
 
