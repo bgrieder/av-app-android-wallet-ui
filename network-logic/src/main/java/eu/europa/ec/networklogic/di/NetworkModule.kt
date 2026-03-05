@@ -16,6 +16,7 @@
 
 package eu.europa.ec.networklogic.di
 
+import android.annotation.SuppressLint
 import eu.europa.ec.businesslogic.config.AppBuildType
 import eu.europa.ec.businesslogic.config.ConfigLogic
 import eu.europa.ec.networklogic.repository.WalletAttestationRepository
@@ -29,6 +30,12 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -45,9 +52,27 @@ fun provideJson(): Json = Json {
     isLenient = true
 }
 
+@SuppressLint("CustomX509TrustManager", "TrustAllX509TrustManager")
 @Single
 fun provideHttpClient(json: Json, configLogic: ConfigLogic): HttpClient {
     return HttpClient(Android) {
+//        if (configLogic.appBuildType == AppBuildType.DEBUG) {
+            engine {
+                sslManager = { connection ->
+                    val trustAllCerts = arrayOf<TrustManager>(
+                        object : X509TrustManager {
+                            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+                            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+                            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                        }
+                    )
+                    val sslContext = SSLContext.getInstance("TLS")
+                    sslContext.init(null, trustAllCerts, SecureRandom())
+                    connection.sslSocketFactory = sslContext.socketFactory
+                    connection.hostnameVerifier = HostnameVerifier { _, _ -> true }
+                }
+            }
+//        }
 
         install(Logging) {
             logger = Logger.DEFAULT
